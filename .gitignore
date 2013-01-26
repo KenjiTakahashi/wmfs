@@ -2,3 +2,4 @@ Makefile
 wmfs
 src/*.o
 *~
+*.swp

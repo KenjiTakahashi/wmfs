@@ -380,7 +380,11 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
+#ifdef HAVE_XFT
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg.pixel);
+#else
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg);
+#endif
 
                STORE_MOUSEBIND();
 
@@ -391,7 +395,11 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
+#ifdef HAVE_XFT
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg.pixel);
+#else
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg);
+#endif
 
                /* Progress bar geo */
                g.x = sq->geo.x + sq->data[0];
@@ -422,7 +430,11 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
+#ifdef HAVE_XFT
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg.pixel);
+#else
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg);
+#endif
 
                if(sq->data[1] > sq->data[2])
                     sq->data[1] = sq->data[2];
@@ -443,7 +455,11 @@ status_apply_list(struct status_ctx *ctx)
                NOALIGN_Y();
                STATUS_ALIGN(sq->align);
 
-               draw_rect(ctx->barwin->dr, &sq->geo, sq->bg);
+#ifdef HAVE_XFT
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg.pixel);
+#else
+               draw_rect(ctx->barwin->dr, &sq->geo, sq->fg);
+#endif
 
                status_graph_process(ctx, sq, sq->str);
 
