@@ -349,13 +349,13 @@ status_apply_list(struct status_ctx *ctx)
           /* Text */
           case 's':
 #ifdef HAVE_XFT
-               sq->geo.h = ctx->theme->font->height;
+               sq->geo.h = ctx->theme->font[0]->height; // FIXME
 #else
                sq->geo.h = ctx->theme->font.height;
 #endif /* HAVE_XFT */
 
                if(sq->align != NoAlign)
-                    sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h);
+                    sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h, 0);
 
 #ifdef HAVE_XFT
                /* Bold Text */
@@ -384,38 +384,38 @@ status_apply_list(struct status_ctx *ctx)
                                    break;
                          }
                     if(!end) {
-                         sq->geo.w = draw_textw(ctx->theme, dstr);
+                         sq->geo.w = draw_textw(ctx->theme, dstr, 0);
                          STATUS_ALIGN(sq->align);
-                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr);
+                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr, 0);
                          *beg = '\0';
                          continue;
                     }
                     *dstr = '\0';
                     if(*beg != '\0') {
-                         sq->geo.w = draw_textw(ctx->theme, beg);
+                         sq->geo.w = draw_textw(ctx->theme, beg, 0);
                          STATUS_ALIGN(sq->align);
-                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg);
+                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg, 0);
                     }
                     *end = '\0';
                     dstr++;
                     if(*dstr != '\0') {
-                         sq->geo.w = draw_textw(ctx->theme, dstr);
+                         sq->geo.w = draw_textw(ctx->theme, dstr, 0);
                          STATUS_ALIGN(sq->align);
-                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr);
+                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr, 0);
                     }
                     ++end;
                     beg = dstr = end;
                }
                if(*beg != '\0') {
-                    sq->geo.w = draw_textw(ctx->theme, beg);
+                    sq->geo.w = draw_textw(ctx->theme, beg, 0);
                     STATUS_ALIGN(sq->align);
-                    draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg);
+                    draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg, 0);
                }
                free(sauv);
 #else
-               sq->geo.w = draw_textw(ctx->theme, sq->str);
+               sq->geo.w = draw_textw(ctx->theme, sq->str, 0);
                STATUS_ALIGN(sq->align);
-               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
+               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str, 0);
 #endif /* HAVE_XFT */
 
                if(!SLIST_EMPTY(&sq->mousebinds))
@@ -556,13 +556,13 @@ status_render(struct status_ctx *ctx)
      /* Use simple text instead sequence if no sequence found */
      if(SLIST_EMPTY(&ctx->statushead))
      {
-          int l = draw_textw(ctx->theme, ctx->status);
+          int l = draw_textw(ctx->theme, ctx->status, 0);
 #ifdef HAVE_XFT
           draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+                    TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #else
           draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+                    TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #endif /* HAVE_XFT */
      }
      else

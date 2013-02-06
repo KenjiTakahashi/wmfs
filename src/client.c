@@ -430,11 +430,11 @@ client_frame_update(struct client *c, struct colpair *cp)
      }
 
      f = (c->rgeo.w / n) + (c->border * 1.5);
-     y = TEXTY(c->theme, c->tbarw);
+     y = TEXTY(c->theme, c->tbarw, 0);
 
      if(n == 1)
      {
-          w = draw_textw(c->theme, c->title);
+          w = draw_textw(c->theme, c->title, 0);
           _XTEXT();
 
           barwin_reparent(c->titlebar, c->frame);
@@ -445,9 +445,9 @@ client_frame_update(struct client *c, struct colpair *cp)
           _STATUSLINE(c, (cp == &c->scol));
 
 #ifdef HAVE_XFT
-          draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, c->title);
+          draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, c->title, 0);
 #else
-          draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title);
+          draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, c->title, 0);
 #endif /* HAVE_XFT */
           barwin_refresh(c->titlebar);
      }
@@ -461,7 +461,7 @@ client_frame_update(struct client *c, struct colpair *cp)
           SLIST_FOREACH(cc, &c->tag->clients, tnext)
           {
                title = (cc->title ? cc->title : "WMFS");
-               w = draw_textw(c->theme, title);
+               w = draw_textw(c->theme, title, 0);
                _XTEXT();
 
                if(cc == c)
@@ -477,9 +477,9 @@ client_frame_update(struct client *c, struct colpair *cp)
                     _STATUSLINE(c, true);
                     draw_rect(c->titlebar->dr, &g, c->scol.bg);
 #ifdef HAVE_XFT
-                    draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, title);
+                    draw_text(c->titlebar->xftdraw, c->theme, xt, y, cp->fg, title, 0);
 #else
-                    draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, title);
+                    draw_text(c->titlebar->dr, c->theme, xt, y, cp->fg, title, 0);
 #endif /* HAVE_XFT */
                     barwin_refresh(c->titlebar);
 
@@ -499,9 +499,9 @@ client_frame_update(struct client *c, struct colpair *cp)
                     _STATUSLINE(cc, false);
                     draw_rect(cc->titlebar->dr, &g, c->scol.bg);
 #ifdef HAVE_XFT
-                    draw_text(cc->titlebar->xftdraw, c->theme, xt, y - 1, c->ncol.fg, title);
+                    draw_text(cc->titlebar->xftdraw, c->theme, xt, y - 1, c->ncol.fg, title, 0);
 #else
-                    draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, title);
+                    draw_text(cc->titlebar->dr, c->theme, xt, y - 1, c->ncol.fg, title, 0);
 #endif /* HAVE_XFT */
                     barwin_refresh(cc->titlebar);
 

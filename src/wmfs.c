@@ -83,12 +83,12 @@ wmfs_numlockmask(void)
 
 #ifdef HAVE_XFT
 void
-wmfs_init_font(char *font, struct theme *t)
+wmfs_init_font(char *font, XftFont **f)
 {
-     if(!(t->font = XftFontOpenName(W->dpy, W->xscreen, font)))
+     if(!(*f = XftFontOpenName(W->dpy, W->xscreen, font)))
      {
           warnxl("Can't load font '%s'", font);
-          t->font = XftFontOpenName(W->dpy, W->xscreen, "fixed");
+          *f = XftFontOpenName(W->dpy, W->xscreen, "fixed");
      }
 }
 #else
@@ -455,7 +455,12 @@ wmfs_quit(void)
           t = SLIST_FIRST(&W->h.theme);
           SLIST_REMOVE_HEAD(&W->h.theme, next);
 #ifdef HAVE_XFT
-          XftFontClose(W->dpy, t->font);
+          size_t i;
+          for(i = 0; i < t->fontnum; ++i)
+          {
+               XftFontClose(W->dpy, t->font[i]);
+          }
+          free(t->font);
 #else
           XFreeFontSet(W->dpy, t->font.fontset);
 #endif /* HAVE_XFT */

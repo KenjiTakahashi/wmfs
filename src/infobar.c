@@ -54,7 +54,7 @@ infobar_elem_tag_init(struct element *e)
      /* Get final size before to use in placement */
      e->geo.w = e->infobar->theme->tags_border_width << 1;
      TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
-          e->geo.w += draw_textw(e->infobar->theme, t->name) + PAD;
+          e->geo.w += draw_textw(e->infobar->theme, t->name, 0) + PAD;
 
      infobar_elem_placement(e);
 
@@ -74,7 +74,7 @@ infobar_elem_tag_init(struct element *e)
 
           TAILQ_FOREACH(t, &e->infobar->screen->tags, next)
           {
-               s = draw_textw(e->infobar->theme, t->name) + PAD;
+               s = draw_textw(e->infobar->theme, t->name, 0) + PAD;
 
                /* Init barwin */
                b = barwin_new(e->infobar->bar->win, j, 0, s, e->geo.h, e->infobar->theme->bars.fg, 0, false);
@@ -166,10 +166,10 @@ infobar_elem_tag_update(struct element *e)
 
 #ifdef HAVE_XFT
           draw_text(b->xftdraw, e->infobar->theme, (PAD >> 1),
-                    TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
+                    TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, t->name, 0);
 #else
           draw_text(b->dr, e->infobar->theme, (PAD >> 1),
-                    TEXTY(e->infobar->theme, e->geo.h), b->fg, t->name);
+                    TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, t->name, 0);
 #endif /* HAVE_XFT */
 
           barwin_refresh(b);
@@ -296,11 +296,11 @@ infobar_elem_launcher_update(struct element *e)
 
      barwin_refresh_color(b);
 
-     l = draw_textw(e->infobar->theme, e->data) + 2;
+     l = draw_textw(e->infobar->theme, e->data, 0) + 2;
 #ifdef HAVE_XFT
-     draw_text(b->xftdraw, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h), b->fg, e->data);
+     draw_text(b->xftdraw, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, e->data, 0);
 #else
-     draw_text(b->dr, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h), b->fg, e->data);
+     draw_text(b->dr, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, e->data, 0);
 #endif /* HAVE_XFT */
 
      /* Cursor */
