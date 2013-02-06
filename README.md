@@ -6,10 +6,10 @@ my (KenjiTakahashi) patches info:
 * Multiple fonts support (see below).
 
 ### Multiple fonts
-A [fonts][font] directive which offers declaring any (see note2) number of fonts to use with statuses.
+A [fonts][font] directive which offers declaring any number (see **note2**) of fonts to use with statuses.
 
 The `wmfsrc` syntax is as follows:
-```ini
+```sh
 [themes]
     [theme]
         [fonts]
@@ -34,7 +34,7 @@ So, in your status script, do:
 ```sh
 ^s[<position>;<color>;{1textusingfont1}textusingdefaultfont(0)]
 ```
-**note0**: If you have a space just before bolded block, you might want to place it *inside*, because XftTextExtents seems to ignore trailing whitespaces.
+**note0**: If you have a space just before curly block, you might want to place it *inside*, because XftTextExtents seems to ignore trailing whitespaces.
 
 **note1**: It works only with Xft enabled, because I'm lazy. (It probably won't get fixed)
 
