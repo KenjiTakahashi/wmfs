@@ -276,7 +276,8 @@ struct theme
 
      /* Font */
 #ifdef HAVE_XFT
-     XftFont *font;
+     XftFont **font;
+     size_t fontnum;
 #else
      struct
      {
@@ -436,7 +437,11 @@ int wmfs_error_handler(Display *d, XErrorEvent *event);
 int wmfs_error_handler_dummy(Display *d, XErrorEvent *event);
 void wmfs_grab_keys(void);
 void wmfs_numlockmask(void);
+#ifdef HAVE_XFT
+void wmfs_init_font(char *font, XftFont **f);
+#else
 void wmfs_init_font(char *font, struct theme *t);
+#endif
 void wmfs_quit(void);
 void uicb_reload(Uicb cmd);
 void uicb_quit(Uicb cmd);

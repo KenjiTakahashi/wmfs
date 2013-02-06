@@ -324,7 +324,7 @@ status_parse(struct status_ctx *ctx)
      {                                                            \
           sq->geo.x = ctx->barwin->geo.w - right - sq->geo.w;     \
           right += sq->geo.w;                                     \
-     }
+     }                                                            \
 
 #define STORE_MOUSEBIND()                                       \
      if(!SLIST_EMPTY(&sq->mousebinds))                          \
@@ -348,22 +348,86 @@ status_apply_list(struct status_ctx *ctx)
           {
           /* Text */
           case 's':
-               sq->geo.w = draw_textw(ctx->theme, sq->str);
 #ifdef HAVE_XFT
-               sq->geo.h = ctx->theme->font->height;
+               sq->geo.h = ctx->theme->font[0]->height; // FIXME
 #else
                sq->geo.h = ctx->theme->font.height;
-#endif
+#endif /* HAVE_XFT */
 
                if(sq->align != NoAlign)
-                    sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h);
-
-               STATUS_ALIGN(sq->align);
+                    sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h, 0);
 
 #ifdef HAVE_XFT
-               draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
+               int sqgeox = sq->geo.x;
+               char *dstr = xstrdup(sq->str), *sauv = dstr;
+               char *beg = dstr, *end, *t;
+               for(; *dstr; ++dstr) {
+                    if(*dstr != '{')
+                         continue;
+                    if(*(dstr - 1) == '\\') {
+                         t = dstr - 1;
+                         while(*t) {
+                              *t = *(t + 1);
+                              t++;
+                         }
+                         continue;
+                    }
+                    if((end = strchr(dstr + 1, '}')))
+                         while(*(end - 1) == '\\') {
+                              t = end - 1;
+                              while(*t) {
+                                   *t = *(t + 1);
+                                   t++;
+                              }
+                              end = strchr(end + 1, '}');
+                              if(!end)
+                                   break;
+                         }
+                    if(!end) {
+                         sq->geo.w = draw_textw(ctx->theme, dstr, 0);
+                         STATUS_ALIGN(sq->align);
+                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr, 0);
+                         if(sq->align == NoAlign)
+                              sq->geo.x += sq->geo.w;
+                         *beg = '\0';
+                         continue;
+                    }
+                    *dstr = '\0';
+                    if(*beg != '\0') {
+                         sq->geo.w = draw_textw(ctx->theme, beg, 0);
+                         STATUS_ALIGN(sq->align);
+                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg, 0);
+                         if(sq->align == NoAlign)
+                              sq->geo.x += sq->geo.w;
+                    }
+                    *end = '\0';
+                    dstr++;
+                    if(*dstr != '\0') {
+                         size_t fn = *dstr - '0';
+                         ++dstr;
+                         if(ctx->theme->fontnum <= fn)
+                              fn = 0;
+                         sq->geo.w = draw_textw(ctx->theme, dstr, fn);
+                         STATUS_ALIGN(sq->align);
+                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr, fn);
+                         if(sq->align == NoAlign)
+                              sq->geo.x += sq->geo.w;
+                    }
+                    ++end;
+                    beg = dstr = end;
+                    --dstr;
+               }
+               if(*beg != '\0') {
+                    sq->geo.w = draw_textw(ctx->theme, beg, 0);
+                    STATUS_ALIGN(sq->align);
+                    draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg, 0);
+               }
+               free(sauv);
+               sq->geo.x = sqgeox;
 #else
-               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str);
+               sq->geo.w = draw_textw(ctx->theme, sq->str, 0);
+               STATUS_ALIGN(sq->align);
+               draw_text(ctx->barwin->dr, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, sq->str, 0);
 #endif /* HAVE_XFT */
 
                if(!SLIST_EMPTY(&sq->mousebinds))
@@ -504,13 +568,13 @@ status_render(struct status_ctx *ctx)
      /* Use simple text instead sequence if no sequence found */
      if(SLIST_EMPTY(&ctx->statushead))
      {
-          int l = draw_textw(ctx->theme, ctx->status);
+          int l = draw_textw(ctx->theme, ctx->status, 0);
 #ifdef HAVE_XFT
           draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+                    TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #else
           draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h), ctx->barwin->fg, ctx->status);
+                    TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #endif /* HAVE_XFT */
      }
      else

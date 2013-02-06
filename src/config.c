@@ -51,6 +51,10 @@ config_theme(void)
      size_t i, n;
      struct conf_sec *sec, **ks;
      char *tmp;
+#ifdef HAVE_XFT
+     size_t j;
+     struct conf_sec *fnts, **fnt;
+#endif
 
      /* [themes] */
      sec = fetch_section_first(NULL, "themes");
@@ -69,7 +73,19 @@ config_theme(void)
 
           t->name = fetch_opt_first(ks[i], "default", "name").str;
 
+#ifdef HAVE_XFT
+          fnts = fetch_section_first(ks[i], "fonts");
+          fnt = fetch_section(fnts, "font");
+          if(!(t->fontnum = fetch_section_count(fnt)))
+               ++t->fontnum;
+          t->font = (XftFont**)xmalloc(t->fontnum, sizeof(XftFont*));
+          for(j = 0; j < t->fontnum; ++j)
+          {
+               wmfs_init_font(fetch_opt_first(fnt[j], "fixed", "name").str, &t->font[j]);
+          }
+#else
           wmfs_init_font(fetch_opt_first(ks[i], "fixed", "font").str, t);
+#endif
 
           /* bars */
           t->bars.fg    = fgcolor_atoh(fetch_opt_first(ks[i], "#CCCCCC", "bars_fg").str);
