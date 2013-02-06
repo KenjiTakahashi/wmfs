@@ -358,7 +358,7 @@ status_apply_list(struct status_ctx *ctx)
                     sq->geo.y = TEXTY(ctx->theme, ctx->barwin->geo.h, 0);
 
 #ifdef HAVE_XFT
-               /* Bold Text */
+               int sqgeox = sq->geo.x;
                char *dstr = xstrdup(sq->str), *sauv = dstr;
                char *beg = dstr, *end, *t;
                for(; *dstr; ++dstr) {
@@ -387,6 +387,8 @@ status_apply_list(struct status_ctx *ctx)
                          sq->geo.w = draw_textw(ctx->theme, dstr, 0);
                          STATUS_ALIGN(sq->align);
                          draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr, 0);
+                         if(sq->align == NoAlign)
+                              sq->geo.x += sq->geo.w;
                          *beg = '\0';
                          continue;
                     }
@@ -395,16 +397,25 @@ status_apply_list(struct status_ctx *ctx)
                          sq->geo.w = draw_textw(ctx->theme, beg, 0);
                          STATUS_ALIGN(sq->align);
                          draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg, 0);
+                         if(sq->align == NoAlign)
+                              sq->geo.x += sq->geo.w;
                     }
                     *end = '\0';
                     dstr++;
                     if(*dstr != '\0') {
-                         sq->geo.w = draw_textw(ctx->theme, dstr, 0);
+                         size_t fn = *dstr - '0';
+                         ++dstr;
+                         if(ctx->theme->fontnum <= fn)
+                              fn = 0;
+                         sq->geo.w = draw_textw(ctx->theme, dstr, fn);
                          STATUS_ALIGN(sq->align);
-                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr, 0);
+                         draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, dstr, fn);
+                         if(sq->align == NoAlign)
+                              sq->geo.x += sq->geo.w;
                     }
                     ++end;
                     beg = dstr = end;
+                    --dstr;
                }
                if(*beg != '\0') {
                     sq->geo.w = draw_textw(ctx->theme, beg, 0);
@@ -412,6 +423,7 @@ status_apply_list(struct status_ctx *ctx)
                     draw_text(ctx->barwin->xftdraw, ctx->theme, sq->geo.x, sq->geo.y, sq->fg, beg, 0);
                }
                free(sauv);
+               sq->geo.x = sqgeox;
 #else
                sq->geo.w = draw_textw(ctx->theme, sq->str, 0);
                STATUS_ALIGN(sq->align);
