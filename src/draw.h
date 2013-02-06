@@ -119,7 +119,7 @@ draw_textw(struct theme *t, const char *str, int fi)
 {
      XGlyphInfo r;
      XftTextExtentsUtf8(W->dpy, t->font[fi], (FcChar8*) str, strlen(str), &r);
-     return r.width;
+     return r.xOff;
 }
 #else
 static inline unsigned short
