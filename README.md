@@ -2,7 +2,7 @@ next WMFS dev branch.
 
 my (KenjiTakahashi) patches info:
 
-* Xft support (by @draftcode) with fixed bars colors.
+* Xft support (by @draftcode) with fixed bars colors and UTF8.
 * Multiple fonts support (see below).
 
 ### Multiple fonts
