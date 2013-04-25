@@ -4,9 +4,10 @@ my (KenjiTakahashi) patches info:
 
 * Xft support (by @draftcode) with fixed bars colors and UTF8.
 * Multiple fonts support (see below).
+* Current Window Title element.
 
 ### Multiple fonts
-A [fonts][font] directive which offers declaring any number (see **note2**) of fonts to use with statuses.
+A fonts directive which offers declaring any number (see **note2**) of fonts to use with statuses.
 
 The `wmfsrc` syntax is as follows:
 ```sh
@@ -39,3 +40,16 @@ So, in your status script, do:
 **note1**: It works only with Xft enabled, because I'm lazy. (It probably won't get fixed)
 
 **note2**: 'Any number' means <=10, because of an ugly parser hack ;-). (It probably will get fixed)
+
+### Current Window Title
+Displays currently focused window's title.
+Occupies element letter `c`.
+
+Add to bar like this:
+```sh
+[bars]
+    [bar]
+        elements = "c"
+    [/bar]
+[/bars]
+```
