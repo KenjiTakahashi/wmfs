@@ -66,12 +66,13 @@ tag_screen(struct screen *s, struct tag *t)
      clients_arrange_map();
 
      /* Update focus */
-     if(!SLIST_EMPTY(&t->clients) && !(W->flags & WMFS_SCAN))
-          client_focus( client_tab_next(t->sel));
+     if(!(W->flags & WMFS_SCAN))
+          client_focus(client_tab_next(t->sel));
 
      t->flags &= ~TAG_URGENT;
 
      infobar_elem_screen_update(s, ElemTag);
+     infobar_elem_screen_update(s, ElemCurrwin);
 
      ewmh_update_wmfs_props();
 }
@@ -104,6 +105,7 @@ tag_client(struct tag *t, struct client *c)
      if(!t)
      {
           infobar_elem_screen_update(c->screen, ElemTag);
+          infobar_elem_screen_update(c->screen, ElemCurrwin);
           return;
      }
 
@@ -116,6 +118,7 @@ tag_client(struct tag *t, struct client *c)
      SLIST_INSERT_HEAD(&t->clients, c, tnext);
 
      infobar_elem_screen_update(c->screen, ElemTag);
+     infobar_elem_screen_update(c->screen, ElemCurrwin);
 
      if(c->flags & CLIENT_TABMASTER && c->prevtag)
      {
