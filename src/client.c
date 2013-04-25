@@ -709,6 +709,8 @@ client_get_name(struct client *c)
      if(!c->title)
           XFetchName(W->dpy, c->win, &(c->title));
 
+     infobar_elem_screen_update(W->screen, ElemCurrwin);
+
      client_frame_update(c, CCOL(c));
 }
 

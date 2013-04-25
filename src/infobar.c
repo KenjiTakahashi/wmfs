@@ -29,6 +29,8 @@ static void infobar_elem_systray_init(struct element *e);
 static void infobar_elem_systray_update(struct element *e);
 static void infobar_elem_launcher_init(struct element *e);
 static void infobar_elem_launcher_update(struct element *e);
+static void infobar_elem_currwin_init(struct element *e);
+static void infobar_elem_currwin_update(struct element *e);
 
 const struct elem_funcs
 {
@@ -41,6 +43,7 @@ const struct elem_funcs
      { 's', infobar_elem_status_init,   infobar_elem_status_update },
      { 'y', infobar_elem_systray_init,  infobar_elem_systray_update },
      { 'l', infobar_elem_launcher_init, infobar_elem_launcher_update },
+     { 'c', infobar_elem_currwin_init,  infobar_elem_currwin_update },
      { '\0', NULL, NULL }
 };
 
@@ -305,6 +308,60 @@ infobar_elem_launcher_update(struct element *e)
 
      /* Cursor */
      XDrawLine(W->dpy, b->dr, W->gc, l, 2, l, e->geo.h - 4);
+
+     barwin_refresh(b);
+}
+
+static void
+infobar_elem_currwin_init(struct element *e)
+{
+     struct barwin *b;
+
+     if(e->geo.w == 0)
+          e->geo.w = 1;
+
+     infobar_elem_placement(e);
+
+     if(!(b = SLIST_FIRST(&e->bars)))
+     {
+          b = barwin_new(e->infobar->bar->win, e->geo.x, 0, e->geo.w, e->geo.h, e->infobar->theme->bars.fg, 0, false);
+          b->fg = e->infobar->theme->bars.fg;
+          b->bg = e->infobar->theme->bars.bg;
+          SLIST_INSERT_HEAD(&e->bars, b, enext);
+     }
+     else
+     {
+          barwin_move(b, e->geo.x, e->geo.y);
+          barwin_resize(b, e->geo.w, e->geo.h);
+     }
+
+     barwin_refresh_color(b);
+     barwin_refresh(b);
+}
+
+static void
+infobar_elem_currwin_update(struct element *e)
+{
+     struct barwin *b = SLIST_FIRST(&e->bars);
+
+     barwin_refresh_color(b);
+
+     if(W->client)
+     {
+          e->geo.w = draw_textw(e->infobar->theme, W->client->title, 0) + 2;
+          if(b->geo.w != e->geo.w)
+               infobar_elem_reinit(e->infobar);
+#ifdef HAVE_XFT
+          draw_text(b->xftdraw, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, W->client->title, 0);
+#else
+          draw_text(b->dr, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, W->client->title, 0);
+#endif /* HAVE_XFT */
+     }
+     else if(b->geo.w != 1)
+     {
+          e->geo.w = 1;
+          infobar_elem_reinit(e->infobar);
+     }
 
      barwin_refresh(b);
 }
