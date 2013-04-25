@@ -344,26 +344,27 @@ infobar_elem_currwin_update(struct element *e)
 {
      struct barwin *b = SLIST_FIRST(&e->bars);
 
-     barwin_refresh_color(b);
-
      if(W->client)
      {
           e->geo.w = draw_textw(e->infobar->theme, W->client->title, 0) + 2;
-          if(b->geo.w != e->geo.w)
-               infobar_elem_reinit(e->infobar);
+          bool condition = b->geo.w != e->geo.w;
+          if(!condition)
+               barwin_refresh_color(b);
 #ifdef HAVE_XFT
           draw_text(b->xftdraw, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, W->client->title, 0);
 #else
           draw_text(b->dr, e->infobar->theme, 1, TEXTY(e->infobar->theme, e->geo.h, 0), b->fg, W->client->title, 0);
 #endif /* HAVE_XFT */
+          if(condition)
+               infobar_elem_reinit(e->infobar);
+          else
+               barwin_refresh(b);
      }
      else if(b->geo.w != 1)
      {
           e->geo.w = 1;
           infobar_elem_reinit(e->infobar);
      }
-
-     barwin_refresh(b);
 }
 
 #define ELEM_INIT(a)                                  \
