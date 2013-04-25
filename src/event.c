@@ -230,10 +230,12 @@ event_destroynotify(XEvent *e)
 static void
 event_focusin(XEvent *e)
 {
-     if(W->client
-        && e->xfocus.window != W->client->win
-        && e->xfocus.window != W->client->frame)
+     if(W->client && e->xfocus.window != W->client->win)
+        /*&& e->xfocus.window != W->client->frame)*/
+     {
           client_focus(W->client);
+          infobar_elem_screen_update(W->screen, ElemCurrwin);
+     }
 }
 
 static void
