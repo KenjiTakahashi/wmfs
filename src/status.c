@@ -334,8 +334,9 @@ status_parse(struct status_ctx *ctx)
 #define NOALIGN_Y()                                                     \
      if(sq->align != NoAlign)                                           \
           sq->geo.y = (ctx->barwin->geo.h >> 1) - (sq->geo.h >> 1);
+
 static void
-status_apply_list(struct status_ctx *ctx)
+status_apply_list_with_offset(struct status_ctx *ctx, int offset)
 {
      struct status_seq *sq;
      struct mousebind *m;
@@ -344,6 +345,8 @@ status_apply_list(struct status_ctx *ctx)
 
      SLIST_FOREACH(sq, &ctx->statushead, next)
      {
+          if(sq->align == NoAlign)
+               sq->geo.x += offset;
           switch(sq->type)
           {
           /* Text */
@@ -552,12 +555,20 @@ status_apply_list(struct status_ctx *ctx)
 #endif /* HAVE_IMLIB2 */
 
           }
+          if(sq->align == NoAlign)
+               sq->geo.x -= offset;
      }
 }
 
 /* Render current statustext of an element */
 void
 status_render(struct status_ctx *ctx)
+{
+     status_render_with_offset(ctx, 0);
+}
+
+void
+status_render_with_offset(struct status_ctx *ctx, int offset)
 {
      if(!ctx->status)
           return;
@@ -570,15 +581,13 @@ status_render(struct status_ctx *ctx)
      {
           int l = draw_textw(ctx->theme, ctx->status, 0);
 #ifdef HAVE_XFT
-          draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
+          draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l + offset, TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #else
-          draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l,
-                    TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
+          draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l + offset, TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #endif /* HAVE_XFT */
      }
      else
-          status_apply_list(ctx);
+          status_apply_list_with_offset(ctx, offset);
 
      barwin_refresh(ctx->barwin);
 }
@@ -633,6 +642,12 @@ status_copy_mousebind(struct status_ctx *ctx)
 void
 status_manage(struct status_ctx *ctx)
 {
+     status_manage_with_offset(ctx, 0);
+}
+
+void
+status_manage_with_offset(struct status_ctx *ctx, int offset)
+{
      if(!ctx->status)
           return;
 
@@ -640,7 +655,7 @@ status_manage(struct status_ctx *ctx)
 
      status_flush_list(ctx);
      status_parse(ctx);
-     status_render(ctx);
+     status_render_with_offset(ctx, offset);
      status_copy_mousebind(ctx);
 }
 

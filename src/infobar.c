@@ -214,11 +214,17 @@ infobar_elem_status_init(struct element *e)
 static void
 infobar_elem_status_update(struct element *e)
 {
+     struct element *ep = TAILQ_PREV(e, tsub, next);
+     int offset = 0;
+
+     if(ep && ep->type == ElemCurrwin)
+          offset = -ep->geo.w;
+
      if(e->infobar->statusctx.update)
-          status_manage(&e->infobar->statusctx);
+          status_manage_with_offset(&e->infobar->statusctx, offset);
      else
      {
-          status_render(&e->infobar->statusctx);
+          status_render_with_offset(&e->infobar->statusctx, offset);
           status_copy_mousebind(&e->infobar->statusctx);
      }
 }
