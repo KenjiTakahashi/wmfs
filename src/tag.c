@@ -112,6 +112,7 @@ tag_client(struct tag *t, struct client *c)
      c->prevtag = c->tag;
      c->tag = t;
      c->screen = t->screen;
+     t->sel = c;
 
      client_update_props(c, CPROP_LOC);
 
