@@ -581,9 +581,9 @@ status_render_with_offset(struct status_ctx *ctx, int offset)
      {
           int l = draw_textw(ctx->theme, ctx->status, 0);
 #ifdef HAVE_XFT
-          draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l + offset, TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
+          draw_text(ctx->barwin->xftdraw, ctx->theme, ctx->barwin->geo.w - l, TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #else
-          draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l + offset, TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
+          draw_text(ctx->barwin->dr, ctx->theme, ctx->barwin->geo.w - l, TEXTY(ctx->theme, ctx->barwin->geo.h, 0), ctx->barwin->fg, ctx->status, 0);
 #endif /* HAVE_XFT */
      }
      else
