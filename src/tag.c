@@ -106,6 +106,7 @@ tag_client(struct tag *t, struct client *c)
      {
           infobar_elem_screen_update(c->screen, ElemTag);
           infobar_elem_screen_update(c->screen, ElemCurrwin);
+          c->tag->sel = NULL;
           return;
      }
 
